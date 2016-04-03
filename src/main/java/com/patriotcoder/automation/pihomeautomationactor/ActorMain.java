@@ -14,21 +14,67 @@ import com.pi4j.io.gpio.RaspiPin;
 public class ActorMain
 {
 
-    public static void main(String args)
+    public static void main(String[] args)
     {
         System.out.print("Starting up Pi Actor...");
         // create gpio controller instance
         final GpioController gpio = GpioFactory.getInstance();
-        // provision gpio pins #04 as an output pin and make sure is is set to LOW at startup
-        GpioPinDigitalOutput relay1 = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_08, // PIN NUMBER
+
+        GpioPinDigitalOutput relay1 = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_07, // PIN NUMBER
                 "Relay 1", // PIN FRIENDLY NAME (optional)
-                PinState.LOW);      // PIN STARTUP STATE (optional)
-        relay1.setShutdownOptions(true, PinState.LOW, PinPullResistance.OFF);
-        relay1.high();
-        while(true){
-            //run till dead
+                PinState.HIGH);      // PIN STARTUP STATE (optional)
+        relay1.setShutdownOptions(true, PinState.HIGH, PinPullResistance.OFF);
+
+        GpioPinDigitalOutput relay2 = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_00, // PIN NUMBER
+                "Relay 2", // PIN FRIENDLY NAME (optional)
+                PinState.HIGH);      // PIN STARTUP STATE (optional)
+        relay2.setShutdownOptions(true, PinState.HIGH, PinPullResistance.OFF);
+
+        GpioPinDigitalOutput relay3 = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_02, // PIN NUMBER
+                "Relay 3", // PIN FRIENDLY NAME (optional)
+                PinState.HIGH);      // PIN STARTUP STATE (optional)
+        relay3.setShutdownOptions(true, PinState.HIGH, PinPullResistance.OFF);
+
+        GpioPinDigitalOutput relay4 = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_03, // PIN NUMBER
+                "Relay 4", // PIN FRIENDLY NAME (optional)
+                PinState.HIGH);      // PIN STARTUP STATE (optional)
+        relay4.setShutdownOptions(true, PinState.HIGH, PinPullResistance.OFF);
+
+        while (true)
+        {
+                //run till dead
+                relay1.low();
+                sleep();
+                relay1.high();
+                relay2.low();
+                sleep();
+                relay2.high();
+                relay3.low();
+                sleep();
+                relay3.high();
+                relay4.low();
+                sleep();
+                relay4.high();
+
+                relay3.low();
+                sleep();
+                relay3.high();
+                relay2.low();
+                sleep();
+                relay2.high();
         }
-        
-        
+
     }
+
+    private static void sleep()
+    {
+        try
+        {
+            Thread.sleep(250);
+        } catch (InterruptedException e)
+        {
+            ;//eh
+        }
+    }
+
 }
