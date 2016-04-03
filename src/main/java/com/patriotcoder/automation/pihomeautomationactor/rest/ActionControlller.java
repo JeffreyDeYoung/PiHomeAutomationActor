@@ -1,8 +1,11 @@
 package com.patriotcoder.automation.pihomeautomationactor.rest;
 
+import com.patriotcoder.automation.pihomeautomationactor.ActorMain;
 import com.patriotcoder.automation.pihomeautomationactor.PiActor;
 import org.restexpress.Request;
 import org.restexpress.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -11,6 +14,7 @@ import org.restexpress.Response;
 public class ActionControlller
 {
 
+    private static final Logger logger = LoggerFactory.getLogger(ActionControlller.class);
     //private static final UrlBuilder LOCATION_BUILDER = new UrlBuilder();
     
     private PiActor actor;
@@ -23,6 +27,8 @@ public class ActionControlller
 
     public void create(Request request, Response response)
     {
+        logger.info("State change request made.");
+        actor.doStuff();
 //        String name = request.getHeader(Constants.Url.DATABASE, "No database name provided");
 //        Database database = request.getBodyAs(Database.class);
 //
@@ -35,17 +41,7 @@ public class ActionControlller
 //        Database saved = null;//databases.create(database);
 //
 //        // Construct the response for create...
-//        response.setResponseCreated();
-//
-//        // enrich the resource with links, etc. here...
-//        TokenResolver resolver = HyperExpress.bind(Constants.Url.DATABASE, saved.name());
-//
-//        // Include the Location header...
-//        String locationPattern = request.getNamedUrl(HttpMethod.GET, Constants.Routes.DATABASE);
-//        response.addLocationHeader(LOCATION_BUILDER.build(locationPattern, resolver));
-//
-//        // Return the newly-created resource...
-//        return saved;
+        response.setResponseCreated();
     }
 
     public void update(Request request, Response response)
