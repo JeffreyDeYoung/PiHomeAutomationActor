@@ -86,5 +86,30 @@
             <artifactId>pi4j-core</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.strategicgains</groupId>
+            <artifactId>RestExpress</artifactId>
+            <version>0.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.7</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.7</version> <!--needed for MDC testing-->        
+        </dependency>
+        <dependency>
+            <groupId>com.strategicgains.plugin-express</groupId>
+            <artifactId>VersionPlugin</artifactId>
+            <version>0.3.0</version>
+        </dependency>
     </dependencies>
 </project>
