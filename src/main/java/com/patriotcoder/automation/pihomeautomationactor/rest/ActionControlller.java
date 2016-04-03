@@ -1,6 +1,5 @@
 package com.patriotcoder.automation.pihomeautomationactor.rest;
 
-import com.patriotcoder.automation.pihomeautomationactor.ActorMain;
 import com.patriotcoder.automation.pihomeautomationactor.PiActor;
 import org.restexpress.Request;
 import org.restexpress.Response;

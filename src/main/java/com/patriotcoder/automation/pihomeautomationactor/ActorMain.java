@@ -4,12 +4,8 @@ import com.patriotcoder.automation.pihomeautomationactor.rest.ActionControlller;
 import com.patriotcoder.automation.pihomeautomationactor.rest.HealthCheckController;
 import com.patriotcoder.automation.pihomeautomationactor.rest.Routes;
 import com.patriotcoder.automation.pihomeautomationactor.serialization.SerializationProvider;
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.PinPullResistance;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
+import java.io.File;
+import java.io.IOException;
 import org.restexpress.RestExpress;
 import org.restexpress.plugin.version.VersionPlugin;
 import org.slf4j.Logger;
@@ -41,13 +37,13 @@ public class ActorMain
                     //CacheFactory.shutdownCacheManger();
                 }
             }, "Shutdown-thread"));
-        } catch (RuntimeException e)
+        } catch (Exception e)
         {
             logger.error("Runtime exception when starting/running Docussandra/RestExpress. Could not start.", e);
         }
     }
 
-    public static RestExpress initializeServer(String[] args)
+    public static RestExpress initializeServer(String[] args) throws IOException, IllegalArgumentException
     {
         RestExpress.setSerializationProvider(new SerializationProvider());
         //Identifiers.UUID.useShortUUID(true);
@@ -65,22 +61,11 @@ public class ActorMain
         new VersionPlugin("1.0")
                 .register(server);
 
-        Config config = new Config();
+        Config config = Config.buildConfigFromFile(new File("actor.config"));
         Routes.define(new HealthCheckController(), new ActionControlller(new PiActor(config)), server);
         //Relationships.define(server);
         //configurePlugins(config, server);
         //mapExceptions(server);
-
-//        //required pi security
-//        piAuthenticator = getKeyMapAuthenticator(config.getSecurityConfig());
-//        preprocessor = new PiAuthenticationPreprocessor(piAuthenticator);
-//        if (config.getPort() == 0)
-//        {//no port? calculate it off of the version number
-//            server.setPort(calculatePort(config.getProjectVersion()));
-//        } else
-//        {
-//            server.setPort(config.getPort());
-//        }
         server.bind(8080);
         logger.info("-----Pi Actor initalized.-----");
         return server;
