@@ -22,8 +22,8 @@ public class ActorMain
 
     public static void main(String[] args)
     {
-        System.out.print("Starting up Pi Actor...");
-        System.out.print("(Logger)Starting up Pi Actor...");
+        System.out.println("Starting up Pi Actor...");
+        logger.info("(Logger)Starting up Pi Actor...");
         try
         {
             RestExpress server = initializeServer(args);
@@ -62,7 +62,8 @@ public class ActorMain
                 .register(server);
 
         Config config = Config.buildConfigFromFile(new File("actor.config"));
-        Routes.define(new HealthCheckController(), new ActionControlller(new PiActor(config)), server);
+        PiActor actor = PiActor.getPiActor(config);        
+        Routes.define(new HealthCheckController(), new ActionControlller(actor), server);
         //Relationships.define(server);
         //configurePlugins(config, server);
         //mapExceptions(server);

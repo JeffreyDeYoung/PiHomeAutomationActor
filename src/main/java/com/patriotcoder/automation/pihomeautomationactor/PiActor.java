@@ -6,18 +6,75 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
+import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Actor class that manipulates the PI's GPIO ports.
+ *
  * @author Jeffrey DeYoung
  */
 public class PiActor
 {
-    
+
+    private static final Logger logger = LoggerFactory.getLogger(PiActor.class);
+    private static PiActor instance;
     private static final GpioController gpio = GpioFactory.getInstance();
-    
-    public PiActor(Config config){
-        
+    private static HashMap<String, GpioPinDigitalOutput> outputs;
+
+    /**
+     * Constructor. Private for singleton.
+     *
+     * @param config Config object for the Actor.
+     */
+    private PiActor(Config config)
+    {
+        logger.debug("Initalizing PI actor.");
+        outputs = new HashMap<>(config.getAbilities().size());
+        for (ActorAbility aa : config.getAbilities())
+        {
+            GpioPinDigitalOutput output = gpio.provisionDigitalOutputPin(aa.getGpioPin(), aa.getName(), aa.getStartAndEndState());
+            output.setShutdownOptions(true, aa.getStartAndEndState(), PinPullResistance.OFF);
+            outputs.put(aa.getName(), output);
+        }
+        logger.debug("Done initalizing PI actor.");
+    }
+
+    public void performAction(Action action) throws IllegalArgumentException
+    {
+        GpioPinDigitalOutput output = outputs.get(action.getName());
+        logger.debug("Performing action: " + action.toString() + " on " + output.toString());
+                
+        if (output == null)
+        {
+            throw new IllegalArgumentException("This is not a vaild action for this device.");
+        }
+        if (action.getState().equalsIgnoreCase("LOW"))
+        {
+            output.low();
+        } else if (action.getState().equalsIgnoreCase("HIGH"))
+        {
+            output.high();
+        } else
+        {
+            throw new IllegalArgumentException("This is not a vaild state: " + action.getState());
+        }
+    }
+
+    /**
+     * Builder method.
+     *
+     * @param config Config Object for this Actor.
+     * @return a ready to use PiActor object.
+     */
+    public static PiActor getPiActor(Config config)
+    {
+        if (instance == null)
+        {
+            instance = new PiActor(config);
+        }
+        return instance;
     }
 
     public static void doStuff()
