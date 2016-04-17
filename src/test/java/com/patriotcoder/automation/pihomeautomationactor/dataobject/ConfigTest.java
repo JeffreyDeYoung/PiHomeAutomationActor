@@ -1,10 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package com.patriotcoder.automation.pihomeautomationactor;
+package com.patriotcoder.automation.pihomeautomationactor.dataobject;
 
+import com.patriotcoder.automation.pihomeautomationactor.dataobject.Config;
+import com.patriotcoder.automation.pihomeautomationactor.dataobject.ActorAbility;
+import com.patriotcoder.automation.pihomeautomationactor.dataobject.State;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import java.io.File;
@@ -18,7 +16,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author Jeffrey DeYoung
+ * @author https://github.com/JeffreyDeYoung
  */
 public class ConfigTest
 {
@@ -58,15 +56,15 @@ public class ConfigTest
                 + "#Name of this actor\n"
                 + "BarnActor\n"
                 + "#Start of Ability Descriptions\n"
-                + "MainAir 7 HIGH\n"
-                + "HouseAir 8 HIGH\n"
-                + "EquipmentBreaker 9 HIGH\n"
-                + "AirCompressor 10 HIGH";
+                + "MainAir 7 HIGH OFF\n"
+                + "HouseAir 8 HIGH OFF\n"
+                + "EquipmentBreaker 9 HIGH OFF\n"
+                + "AirCompressor 10 HIGH OFF";
         ArrayList<ActorAbility> abilities = new ArrayList<>(4);
-        abilities.add(new ActorAbility("MainAir", RaspiPin.GPIO_07, PinState.HIGH));
-        abilities.add(new ActorAbility("HouseAir", RaspiPin.GPIO_08, PinState.HIGH));
-        abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_09, PinState.HIGH));
-        abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_10, PinState.HIGH));
+        abilities.add(new ActorAbility("MainAir", RaspiPin.GPIO_07, PinState.HIGH, State.OFF));
+        abilities.add(new ActorAbility("HouseAir", RaspiPin.GPIO_08, PinState.HIGH, State.OFF));
+        abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_09, PinState.HIGH, State.OFF));
+        abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_10, PinState.HIGH, State.OFF));
         String expectedName = "BarnActor";
         Config expResult = new Config(expectedName, abilities);
         Config result = Config.buildConfigFromString(in);
@@ -81,10 +79,10 @@ public class ConfigTest
     {
         System.out.println("buildConfigFromFile");
         ArrayList<ActorAbility> abilities = new ArrayList<>(4);
-        abilities.add(new ActorAbility("MainAir", RaspiPin.GPIO_07, PinState.HIGH));
-        abilities.add(new ActorAbility("HouseAir", RaspiPin.GPIO_08, PinState.HIGH));
-        abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_09, PinState.HIGH));
-        abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_10, PinState.HIGH));
+        abilities.add(new ActorAbility("MainAir", RaspiPin.GPIO_07, PinState.HIGH, State.OFF));
+        abilities.add(new ActorAbility("HouseAir", RaspiPin.GPIO_00, PinState.HIGH, State.OFF));
+        abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_02, PinState.HIGH, State.OFF));
+        abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_03, PinState.HIGH, State.OFF));
         String expectedName = "BarnActor";
         Config expResult = new Config(expectedName, abilities);
         File configFile = new File(".", "actor.config");

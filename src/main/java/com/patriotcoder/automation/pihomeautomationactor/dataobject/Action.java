@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package com.patriotcoder.automation.pihomeautomationactor;
+package com.patriotcoder.automation.pihomeautomationactor.dataobject;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  *
- * @author Jeffrey DeYoung
+ * @author https://github.com/JeffreyDeYoung
  */
 public class Action
 {

@@ -1,7 +1,7 @@
 package com.patriotcoder.automation.pihomeautomationactor.rest;
 
-import com.patriotcoder.automation.pihomeautomationactor.Action;
-import com.patriotcoder.automation.pihomeautomationactor.PiActor;
+import com.patriotcoder.automation.pihomeautomationactor.dataobject.Action;
+import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActor;
 import org.restexpress.Request;
 import org.restexpress.Response;
 import org.slf4j.Logger;
@@ -14,7 +14,6 @@ public class ActionControlller
 {
 
     private static final Logger logger = LoggerFactory.getLogger(ActionControlller.class);
-    //private static final UrlBuilder LOCATION_BUILDER = new UrlBuilder();
 
     private PiActor actor;
 

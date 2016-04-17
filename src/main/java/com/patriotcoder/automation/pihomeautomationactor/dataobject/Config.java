@@ -1,5 +1,6 @@
-package com.patriotcoder.automation.pihomeautomationactor;
+package com.patriotcoder.automation.pihomeautomationactor.dataobject;
 
+import com.patriotcoder.automation.pihomeautomationactor.dataobject.ActorAbility;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,7 +11,7 @@ import java.util.Objects;
  * Configuration class for this application. Describes what this Pi actor does
  * and how to use it.
  *
- * @author Jeffrey DeYoung
+ * @author https://github.com/JeffreyDeYoung
  */
 public class Config
 {
