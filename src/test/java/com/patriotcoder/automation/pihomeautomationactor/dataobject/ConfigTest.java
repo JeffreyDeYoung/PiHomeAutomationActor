@@ -1,8 +1,5 @@
 package com.patriotcoder.automation.pihomeautomationactor.dataobject;
 
-import com.patriotcoder.automation.pihomeautomationactor.dataobject.Config;
-import com.patriotcoder.automation.pihomeautomationactor.dataobject.ActorAbility;
-import com.patriotcoder.automation.pihomeautomationactor.dataobject.State;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import java.io.File;
@@ -55,6 +52,8 @@ public class ConfigTest
         String in = "#This is a sample configuration file.\n"
                 + "#Name of this actor\n"
                 + "BarnActor\n"
+                + "#Docussandra URL\n"
+                + "http://10.0.0.1\n"
                 + "#Start of Ability Descriptions\n"
                 + "MainAir 7 HIGH OFF\n"
                 + "HouseAir 8 HIGH OFF\n"
@@ -66,7 +65,7 @@ public class ConfigTest
         abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_09, PinState.HIGH, State.OFF));
         abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_10, PinState.HIGH, State.OFF));
         String expectedName = "BarnActor";
-        Config expResult = new Config(expectedName, abilities);
+        Config expResult = new Config(expectedName, "http://10.0.0.1", abilities);
         Config result = Config.buildConfigFromString(in);
         assertEquals(expResult, result);
     }
@@ -84,7 +83,7 @@ public class ConfigTest
         abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_02, PinState.HIGH, State.OFF));
         abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_03, PinState.HIGH, State.OFF));
         String expectedName = "BarnActor";
-        Config expResult = new Config(expectedName, abilities);
+        Config expResult = new Config(expectedName, "http://10.0.0.1", abilities);
         File configFile = new File(".", "actor.config");
         Config result = Config.buildConfigFromFile(configFile);
         assertEquals(expResult, result);
