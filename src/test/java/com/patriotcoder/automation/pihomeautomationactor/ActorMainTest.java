@@ -1,5 +1,6 @@
 package com.patriotcoder.automation.pihomeautomationactor;
 
+import com.docussandra.javasdk.testhelper.TestUtils;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.ActorAbility;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.Config;
 import java.io.File;
@@ -10,6 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
@@ -77,6 +79,34 @@ public class ActorMainTest
         }
         JSONParser parser = new JSONParser();
         parser.parse(result);//make sure it's valid JSON
+    }
+
+    /**
+     * Test of main method, of class ActorMain.
+     */
+    @Test
+    @Ignore
+    public void testMain()
+    {
+        System.out.println("main");
+        String[] args = null;
+        ActorMain.main(args);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of selfRegister method, of class ActorMain.
+     */
+    @Test
+    public void testSelfRegister() throws Exception
+    {
+        System.out.println("selfRegister");
+        TestUtils.establishTestServer();
+        File configFile = new File(".", "actor.config");
+        Config config = Config.buildConfigFromFile(configFile);
+        config.setDocussandraUrl("http://localhost:19808/");
+        ActorMain.selfRegister(config);
     }
 
 }

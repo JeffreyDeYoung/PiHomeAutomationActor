@@ -124,7 +124,7 @@ public class Config
     {
         int hash = 7;
         hash = 29 * hash + Objects.hashCode(this.piName);
-        hash = 29 * hash + Objects.hashCode(this.docussandraUrl);
+        hash = 29 * hash + Objects.hashCode(this.getDocussandraUrl());
         hash = 29 * hash + Objects.hashCode(this.abilities);
         return hash;
     }
@@ -159,7 +159,7 @@ public class Config
     @Override
     public String toString()
     {
-        return "Config{" + "piName=" + piName + ", docussandraUrl=" + docussandraUrl + ", abilities=" + abilities + '}';
+        return "Config{" + "piName=" + piName + ", docussandraUrl=" + getDocussandraUrl() + ", abilities=" + abilities + '}';
     }
 
 
@@ -171,6 +171,15 @@ public class Config
     public String getDocussandraUrl()
     {
         return docussandraUrl;
+    }
+
+    /**
+     * URL for the Docussandra server.
+     * @param docussandraUrl the docussandraUrl to set
+     */
+    public void setDocussandraUrl(String docussandraUrl)
+    {
+        this.docussandraUrl = docussandraUrl;
     }
 
 }

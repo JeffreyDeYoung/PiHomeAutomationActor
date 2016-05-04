@@ -89,7 +89,15 @@ public class ActorMain
         return actor;
     }
 
-    private static void selfRegister(Config config) throws RESTException, ParseException, IOException, IndexParseException
+    /**
+     * Performs a self registration in Docussandra. Will update the registration if it already exists.
+     * @param config
+     * @throws RESTException
+     * @throws ParseException
+     * @throws IOException
+     * @throws IndexParseException 
+     */
+    public static void selfRegister(Config config) throws RESTException, ParseException, IOException, IndexParseException
     {
         String dbName = "pihomeautomation";
         String tableName = "nodes";
