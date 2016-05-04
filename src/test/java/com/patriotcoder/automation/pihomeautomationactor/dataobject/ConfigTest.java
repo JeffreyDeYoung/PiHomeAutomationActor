@@ -83,7 +83,7 @@ public class ConfigTest
         abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_02, PinState.HIGH, State.OFF));
         abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_03, PinState.HIGH, State.OFF));
         String expectedName = "BarnActor";
-        Config expResult = new Config(expectedName, "http://10.0.0.1", abilities);
+        Config expResult = new Config(expectedName, "http://localhost:8081", abilities);
         File configFile = new File(".", "actor.config");
         Config result = Config.buildConfigFromFile(configFile);
         assertEquals(expResult, result);
