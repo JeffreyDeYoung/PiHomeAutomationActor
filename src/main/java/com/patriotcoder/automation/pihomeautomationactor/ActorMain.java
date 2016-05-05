@@ -107,7 +107,7 @@ public class ActorMain
         Query existanceQuery = new Query();
         existanceQuery.setDatabase(dbName);
         existanceQuery.setTable(tableName);
-        existanceQuery.setWhere("name = \"" + config.getPiName() + "\"");        
+        existanceQuery.setWhere("name = \'" + config.getPiName() + "\'");        
         QueryResponseWrapper qrw = queryDao.query(dbName, existanceQuery);
         UUID updateUUID = null;
         if(!qrw.isEmpty()){

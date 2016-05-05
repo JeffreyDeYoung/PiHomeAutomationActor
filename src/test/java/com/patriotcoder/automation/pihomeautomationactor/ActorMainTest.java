@@ -105,7 +105,7 @@ public class ActorMainTest
         TestUtils.establishTestServer();
         File configFile = new File(".", "actor.config");
         Config config = Config.buildConfigFromFile(configFile);
-        config.setDocussandraUrl("http://localhost:19808/");
+        config.setDocussandraUrl("http://localhost:19080/");
         ActorMain.selfRegister(config);
     }
 

@@ -139,7 +139,7 @@
             <artifactId>SwaggerPlugin</artifactId>
             <version>0.3.3</version>
             <scope>test</scope>
-        </dependency> 
+        </dependency>        
         <!-- end needed for docussandra mocking-->
     </dependencies>
 </project>
