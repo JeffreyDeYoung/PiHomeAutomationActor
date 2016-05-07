@@ -27,7 +27,7 @@ public class PiActor
      *
      * @param config Config object for the Actor.
      */
-    private PiActor(Config config)
+    private PiActor(PiActorConfig config)
     {
         logger.debug("Initalizing PI actor.");
         outputs = new HashMap<>(config.getAbilities().size());
@@ -72,7 +72,7 @@ public class PiActor
      * @param config Config Object for this Actor.
      * @return a ready to use PiActor object.
      */
-    public static PiActor getPiActor(Config config)
+    public static PiActor getPiActor(PiActorConfig config)
     {
         if (instance == null)
         {

@@ -15,10 +15,10 @@ import static org.junit.Assert.*;
  *
  * @author https://github.com/JeffreyDeYoung
  */
-public class ConfigTest
+public class PiActorConfigTest
 {
 
-    public ConfigTest()
+    public PiActorConfigTest()
     {
     }
 
@@ -52,6 +52,8 @@ public class ConfigTest
         String in = "#This is a sample configuration file.\n"
                 + "#Name of this actor\n"
                 + "BarnActor\n"
+                + "#Location of this actor\n"
+                + "Barn\n"
                 + "#Docussandra URL\n"
                 + "http://10.0.0.1\n"
                 + "#Start of Ability Descriptions\n"
@@ -65,8 +67,8 @@ public class ConfigTest
         abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_09, PinState.HIGH, State.OFF));
         abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_10, PinState.HIGH, State.OFF));
         String expectedName = "BarnActor";
-        Config expResult = new Config(expectedName, "http://10.0.0.1", abilities);
-        Config result = Config.buildConfigFromString(in);
+        PiActorConfig expResult = new PiActorConfig(expectedName, "barn", "http://10.0.0.1", abilities);
+        PiActorConfig result = PiActorConfig.buildConfigFromString(in);
         assertEquals(expResult, result);
     }
 
@@ -83,9 +85,9 @@ public class ConfigTest
         abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_02, PinState.HIGH, State.OFF));
         abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_03, PinState.HIGH, State.OFF));
         String expectedName = "BarnActor";
-        Config expResult = new Config(expectedName, "http://localhost:8081", abilities);
+        PiActorConfig expResult = new PiActorConfig(expectedName, "barn", "http://localhost:8081", abilities);
         File configFile = new File(".", "actor.config");
-        Config result = Config.buildConfigFromFile(configFile);
+        PiActorConfig result = PiActorConfig.buildConfigFromFile(configFile);
         assertEquals(expResult, result);
 
     }

@@ -12,14 +12,20 @@ import java.util.Objects;
  *
  * @author https://github.com/JeffreyDeYoung
  */
-public class Config
+public class PiActorConfig
 {
 
     /**
      * Name for this Pi Actor.
      */
     private String piName;
-    
+
+    /**
+     * Location for this Pi Actor. This should be a short string that describes
+     * the geographical (physical) area that this Pi assists in managing.
+     */
+    private String location;
+
     /**
      * URL for the Docussandra server.
      */
@@ -34,12 +40,17 @@ public class Config
      * Constructor.
      *
      * @param piName Name of this Pi.
+     * @param location Geographical (physical) location of this pi.
      * @param docussandraUrl URL for the central Docussandra server.
      * @param abilities List of abilities for this Pi.
      */
-    public Config(String piName, String docussandraUrl, ArrayList<ActorAbility> abilities)
+    public PiActorConfig(String piName, String location, String docussandraUrl, ArrayList<ActorAbility> abilities)
     {
         this.piName = piName;
+        if (location != null)
+        {
+            this.location = location.toLowerCase();
+        }
         this.abilities = abilities;
         this.docussandraUrl = docussandraUrl;
     }
@@ -54,7 +65,7 @@ public class Config
      * @throws IllegalArgumentException If the input was not in the expected
      * format.
      */
-    public static Config buildConfigFromString(String in) throws IllegalArgumentException
+    public static PiActorConfig buildConfigFromString(String in) throws IllegalArgumentException
     {
         try
         {
@@ -68,13 +79,14 @@ public class Config
                 }
             }
             String name = splitsList.get(0);
-            String docussandraUrl = splitsList.get(1);
-            ArrayList<ActorAbility> abilities = new ArrayList<>(splitsList.size() - 2);
-            for (int i = 2; i < splitsList.size(); i++)
+            String location = splitsList.get(1);
+            String docussandraUrl = splitsList.get(2);
+            ArrayList<ActorAbility> abilities = new ArrayList<>(splitsList.size() - 3);
+            for (int i = 3; i < splitsList.size(); i++)
             {
                 abilities.add(ActorAbility.buildFromConfigLine(splitsList.get(i)));
             }
-            return new Config(name, docussandraUrl, abilities);
+            return new PiActorConfig(name, location, docussandraUrl, abilities);
         } catch (IndexOutOfBoundsException e)
         {
             throw new IllegalArgumentException("Input config string was not in the expected format. Your input was: \n" + in);
@@ -93,10 +105,10 @@ public class Config
      * format.
      * @throws IOException If the file can't be read.
      */
-    public static Config buildConfigFromFile(File configFile) throws IllegalArgumentException, IOException
+    public static PiActorConfig buildConfigFromFile(File configFile) throws IllegalArgumentException, IOException
     {
         String in = new String(Files.readAllBytes(configFile.toPath()));
-        return Config.buildConfigFromString(in);
+        return PiActorConfig.buildConfigFromString(in);
     }
 
     /**
@@ -124,7 +136,8 @@ public class Config
     {
         int hash = 7;
         hash = 29 * hash + Objects.hashCode(this.piName);
-        hash = 29 * hash + Objects.hashCode(this.getDocussandraUrl());
+        hash = 29 * hash + Objects.hashCode(this.location);
+        hash = 29 * hash + Objects.hashCode(this.docussandraUrl);
         hash = 29 * hash + Objects.hashCode(this.abilities);
         return hash;
     }
@@ -140,8 +153,12 @@ public class Config
         {
             return false;
         }
-        final Config other = (Config) obj;
+        final PiActorConfig other = (PiActorConfig) obj;
         if (!Objects.equals(this.piName, other.piName))
+        {
+            return false;
+        }
+        if (!Objects.equals(this.location, other.location))
         {
             return false;
         }
@@ -159,13 +176,13 @@ public class Config
     @Override
     public String toString()
     {
-        return "Config{" + "piName=" + piName + ", docussandraUrl=" + getDocussandraUrl() + ", abilities=" + abilities + '}';
+        return "PiActorConfig{" + "piName=" + piName + ", location=" + location + ", docussandraUrl=" + docussandraUrl + ", abilities=" + abilities + '}';
     }
 
-
-
+ 
     /**
      * URL for the Docussandra server.
+     *
      * @return the docussandraUrl
      */
     public String getDocussandraUrl()
@@ -175,11 +192,23 @@ public class Config
 
     /**
      * URL for the Docussandra server.
+     *
      * @param docussandraUrl the docussandraUrl to set
      */
     public void setDocussandraUrl(String docussandraUrl)
     {
         this.docussandraUrl = docussandraUrl;
+    }
+
+    /**
+     * Location for this Pi Actor. This should be a short string that describes
+     * the geographical area that this Pi assists in managing.
+     *
+     * @return the location
+     */
+    public String getLocation()
+    {
+        return location;
     }
 
 }
