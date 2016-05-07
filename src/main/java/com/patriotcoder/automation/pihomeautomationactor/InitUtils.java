@@ -8,23 +8,31 @@ import com.docussandra.javasdk.dao.impl.QueryDaoImpl;
 import com.docussandra.javasdk.exceptions.RESTException;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.ActorAbility;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActorConfig;
+import com.patriotcoder.automation.pihomeautomationactor.dataobject.State;
 import com.pearson.docussandra.domain.objects.Database;
 import com.pearson.docussandra.domain.objects.Document;
 import com.pearson.docussandra.domain.objects.Query;
 import com.pearson.docussandra.domain.objects.QueryResponseWrapper;
 import com.pearson.docussandra.domain.objects.Table;
 import com.pearson.docussandra.exception.IndexParseException;
+import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.PinState;
+import com.pi4j.io.gpio.RaspiPin;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.UUID;
+import org.bson.BSONObject;
+import org.bson.types.BasicBSONList;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
 /**
+ * Class that performs some initial startup tasks for this application.
  *
  * @author Jeffrey DeYoung
  */
@@ -32,10 +40,12 @@ public class InitUtils
 {
 
     private PiActorConfig config;
-    
-    public InitUtils(PiActorConfig config){
+
+    public InitUtils(PiActorConfig config)
+    {
         this.config = config;
     }
+
     /**
      * Generates the JSON needed to self register a node.
      *
@@ -48,6 +58,7 @@ public class InitUtils
         selfRegister.put("name", config.getPiName());
         selfRegister.put("ip", getCurrentIp());
         selfRegister.put("running", true);
+        selfRegister.put("location", config.getLocation());
         selfRegister.put("type", "actor");
         JSONArray abilityArray = new JSONArray();
         for (ActorAbility ability : config.getAbilities())
@@ -55,11 +66,98 @@ public class InitUtils
             JSONObject abilityJsonObject = new JSONObject();
             abilityJsonObject.put("name", ability.getName());
             abilityJsonObject.put("gpio_pin", ability.getGpioPin().getAddress());
-            abilityJsonObject.put("default_state", ability.getState().toString());
+            abilityJsonObject.put("default_state", ability.getStartAndEndPinState().toString());
+            abilityJsonObject.put("state", ability.getState().toString());
             abilityArray.add(abilityJsonObject);
         }
         selfRegister.put("abilities", abilityArray);
         return selfRegister.toJSONString();
+    }
+
+    /**
+     * Creates a PiActorConfig based on a BSON object. Used for parsing the
+     * response from a call to the server.
+     *
+     * @param bson BSONOject that contains the data for an actor config.
+     * @return PiActorConfig based on the BSON.
+     */
+    public static PiActorConfig createConfigFromJSON(BSONObject bson)
+    {
+        String name = (String) bson.get("name");
+        String location = (String) bson.get("location");
+        ArrayList<ActorAbility> abilities = new ArrayList<>();
+        BasicBSONList abilityBson = (BasicBSONList) bson.get("abilities");
+        for (Object ability : abilityBson)
+        {
+            BSONObject bsonAbility = (BSONObject) ability;
+            String abilityName = (String) bsonAbility.get("name");
+            int pinNum = (Integer) bsonAbility.get("gpio_pin");
+            Pin pin = RaspiPin.getPinByName("GPIO " + pinNum);
+            PinState pinState;
+            String pinStateString = (String) bsonAbility.get("default_state");
+            if (pinStateString.equalsIgnoreCase("LOW"))
+            {
+                pinState = PinState.LOW;
+            } else
+            {
+                pinState = PinState.HIGH;
+            }
+            State state = State.valueOf((String) bsonAbility.get("state"));
+            ActorAbility aa = new ActorAbility(abilityName, pin, pinState, state);
+            abilities.add(aa);
+        }
+        PiActorConfig toReturn = new PiActorConfig(name, location, null, abilities);
+        return toReturn;
+    }
+
+    /**
+     * Performs a self registration in Docussandra. Will update the registration
+     * if it already exists.
+     *
+     * @param config Config to register with.
+     * @throws RESTException
+     * @throws ParseException
+     * @throws IOException
+     * @throws IndexParseException
+     * @return Any config that was stored on the server for this PI.
+     */
+    public static PiActorConfig selfRegister(PiActorConfig config) throws RESTException, ParseException, IOException, IndexParseException
+    {
+        String dbName = "pihomeautomation";
+        String tableName = "nodes";
+        Config docussandraConfig = new Config(config.getDocussandraUrl());
+        //search for any existing registrations
+        QueryDao queryDao = new QueryDaoImpl(docussandraConfig);
+        Query existanceQuery = new Query();
+        existanceQuery.setDatabase(dbName);
+        existanceQuery.setTable(tableName);
+        existanceQuery.setWhere("name = '" + config.getPiName() + "'");
+        QueryResponseWrapper qrw = queryDao.query(dbName, existanceQuery);
+        UUID updateUUID = null;
+        if (!qrw.isEmpty()) //if we have an existing registration
+        {
+            updateUUID = qrw.get(0).getUuid();//grab the UUID
+            config = createConfigFromJSON(qrw.get(0).object());//and the current information
+            config.setDocussandraUrl(docussandraConfig.getBaseUrl());//the builder object doesn't set the url
+        }
+
+        //create or update the registration
+        DocumentDao docDao = new DocumentDaoImpl(docussandraConfig);
+        Table actorNodeTable = new Table();
+        actorNodeTable.database(new Database(dbName));
+        actorNodeTable.name(tableName);
+        Document registerDoc = new Document();
+        registerDoc.table(actorNodeTable);
+        registerDoc.objectAsString(generateSelfRegisterJson(config));
+        if (updateUUID == null)
+        {
+            docDao.create(actorNodeTable, registerDoc);//create; it hasn't been registered
+        } else
+        {
+            registerDoc.setUuid(updateUUID);//update; this is only to update the timestamps of registration
+            docDao.update(registerDoc);
+        }
+        return config;
     }
 
     //stolen (then modified) from stackoverflow: http://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
@@ -93,6 +191,7 @@ public class InitUtils
      *
      * @throws UnknownHostException If the LAN address of the machine cannot be
      * found.
+     * @return Ip address.
      */
     public static String getCurrentIp() throws UnknownHostException
     {
@@ -135,45 +234,4 @@ public class InitUtils
         }
     }
 
-    /**
-     * Performs a self registration in Docussandra. Will update the registration if it already exists.
-     * @param config
-     * @throws RESTException
-     * @throws ParseException
-     * @throws IOException
-     * @throws IndexParseException
-     */
-    public static void selfRegister(PiActorConfig config) throws RESTException, ParseException, IOException, IndexParseException
-    {
-        String dbName = "pihomeautomation";
-        String tableName = "nodes";
-        Config docussandraConfig = new Config(config.getDocussandraUrl());
-        QueryDao queryDao = new QueryDaoImpl(docussandraConfig);
-        Query existanceQuery = new Query();
-        existanceQuery.setDatabase(dbName);
-        existanceQuery.setTable(tableName);
-        existanceQuery.setWhere("name = '" + config.getPiName() + "'");
-        QueryResponseWrapper qrw = queryDao.query(dbName, existanceQuery);
-        UUID updateUUID = null;
-        if (!qrw.isEmpty())
-        {
-            updateUUID = qrw.get(0).getUuid();
-        }
-        DocumentDao docDao = new DocumentDaoImpl(docussandraConfig);
-        Table actorNodeTable = new Table();
-        actorNodeTable.database(new Database(dbName));
-        actorNodeTable.name(tableName);
-        Document registerDoc = new Document();
-        registerDoc.table(actorNodeTable);
-        registerDoc.objectAsString(generateSelfRegisterJson(config));
-        if (updateUUID == null)
-        {
-            docDao.create(actorNodeTable, registerDoc);
-        } else
-        {
-            registerDoc.setUuid(updateUUID);
-            docDao.update(registerDoc);
-        }
-    }
-    
 }

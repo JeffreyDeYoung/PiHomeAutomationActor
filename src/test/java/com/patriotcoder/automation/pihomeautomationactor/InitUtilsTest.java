@@ -3,6 +3,7 @@ package com.patriotcoder.automation.pihomeautomationactor;
 import com.docussandra.javasdk.dao.QueryDao;
 import com.docussandra.javasdk.dao.impl.QueryDaoImpl;
 import com.docussandra.testhelpers.TestDocussandraManager;
+import com.mongodb.util.JSON;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.ActorAbility;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActorConfig;
 import com.patriotcoder.pihomesecurity.Main;
@@ -10,8 +11,11 @@ import com.patriotcoder.pihomesecurity.dataobjects.PiHomeConfig;
 import com.pearson.docussandra.domain.objects.Query;
 import com.pearson.docussandra.domain.objects.QueryResponseWrapper;
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 import org.apache.commons.math3.stat.inference.TestUtils;
+import org.bson.BSONObject;
+import org.bson.BasicBSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -27,32 +31,32 @@ import org.junit.Ignore;
  */
 public class InitUtilsTest
 {
-    
+
     public InitUtilsTest()
     {
     }
-    
+
     @BeforeClass
     public static void setUpClass()
     {
     }
-    
+
     @AfterClass
     public static void tearDownClass()
     {
     }
-    
+
     @Before
     public void setUp()
     {
     }
-    
+
     @After
     public void tearDown()
     {
     }
 
-/**
+    /**
      * Test of generateSelfRegisterJson method, of class InitUtils.
      */
     @Test
@@ -78,7 +82,6 @@ public class InitUtilsTest
     /**
      * Test of getCurrentIp method, of class InitUtils.
      */
-
     @Test
     public void testGetCurrentIp() throws Exception
     {
@@ -140,5 +143,29 @@ public class InitUtilsTest
         assertNotNull(newUpdateUUID);
         assertEquals(updateUUID, newUpdateUUID);
     }
-    
+
+    /**
+     * Test of createConfigFromJSON method, of class InitUtils.
+     */
+    @Test
+    public void testCreateConfigFromJSON() throws
+            IOException, IllegalArgumentException
+    {
+        System.out.println("createConfigFromJSON");
+        String json = "{ \"running\" : true , \"abilities\" : [ { \"default_state\" : \"HIGH\" , "
+                + "\"name\" : \"MainAir\" , \"state\" : \"OFF\" , \"gpio_pin\" : 7} ,"
+                + " { \"default_state\" : \"HIGH\" , \"name\" : \"HouseAir\" , \"state\" : \"OFF\" , \"gpio_pin\" : 0} ,"
+                + " { \"default_state\" : \"HIGH\" , \"name\" : \"EquipmentBreaker\" , \"state\" : \"OFF\" , \"gpio_pin\" : 2}"
+                + " , { \"default_state\" : \"HIGH\" , \"name\" : \"AirCompressor\" , \"state\" : \"OFF\" , \"gpio_pin\" : 3}]"
+                + " , \"ip\" : \"10.200.53.229\" , \"name\" : \"BarnActor\" , \"location\" : \"barn\" , \"type\" : \"actor\"}";
+        BSONObject bson = (BSONObject) JSON.parse(json);
+
+        File configFile = new File(".", "actor.config");
+        PiActorConfig expected = PiActorConfig.buildConfigFromFile(configFile);
+        expected.setDocussandraUrl(null);
+
+        PiActorConfig result = InitUtils.createConfigFromJSON(bson);
+        assertEquals(expected, result);        
+    }
+
 }
