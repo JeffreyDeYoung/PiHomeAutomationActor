@@ -94,11 +94,11 @@ public class InitUtilsTest
      * Test of selfRegister method, of class InitUtils.
      */
     @Test
-    @Ignore("Something isn't right here; need to investigate.")
     public void testSelfRegister() throws Exception
     {
         System.out.println("selfRegister");
         //setup
+//        String docussandraUrl = "http://localhost:8081/";
         String docussandraUrl = "http://localhost:19080/";
         TestDocussandraManager.getManager().ensureTestDocussandraRunning(true);
         PiHomeConfig serverConfig = new PiHomeConfig();
@@ -135,7 +135,7 @@ public class InitUtilsTest
         UUID newUpdateUUID = null;
         if (!qrw.isEmpty())
         {
-            updateUUID = qrw.get(0).getUuid();
+            newUpdateUUID = qrw.get(0).getUuid();
         }
         assertNotNull(newUpdateUUID);
         assertEquals(updateUUID, newUpdateUUID);

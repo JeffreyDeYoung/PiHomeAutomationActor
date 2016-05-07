@@ -164,6 +164,7 @@ public class InitUtils
         actorNodeTable.database(new Database(dbName));
         actorNodeTable.name(tableName);
         Document registerDoc = new Document();
+        registerDoc.table(actorNodeTable);
         registerDoc.objectAsString(generateSelfRegisterJson(config));
         if (updateUUID == null)
         {
