@@ -10,7 +10,7 @@ import org.restexpress.RestExpress;
 public abstract class Routes
 {
 
-    public static void define(HealthCheckController hcc, ActionControlller ac, RestExpress server)
+    public static void define(HealthCheckController hcc, ActionController ac, RestExpress server)
     {
         //health check        
         server.uri("/health", hcc)

@@ -3,7 +3,7 @@ package com.patriotcoder.automation.pihomeautomationactor;
 import com.docussandra.javasdk.exceptions.RESTException;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActor;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActorConfig;
-import com.patriotcoder.automation.pihomeautomationactor.rest.ActionControlller;
+import com.patriotcoder.automation.pihomeautomationactor.rest.ActionController;
 import com.patriotcoder.automation.pihomeautomationactor.rest.HealthCheckController;
 import com.patriotcoder.automation.pihomeautomationactor.rest.Routes;
 import com.patriotcoder.automation.pihomeautomationactor.serialization.SerializationProvider;
@@ -62,13 +62,14 @@ public class ActorMain
         //get the config from the config file -- contains default settings and name
         PiActorConfig config = PiActorConfig.buildConfigFromFile(new File("actor.config"));
 
-        //self register with the central DB
-        InitUtils.selfRegister(config);
+        //self register with the central DB; grab any config that's on the server
+        config = InitUtils.selfRegister(config);
 
-        //Pull Down any overrides from the central DB
-        //TODO
         //Create and return the actor
         PiActor actor = PiActor.getPiActor(config);
+        
+        //set our inital states
+        InitUtils.setStates(config, actor);
         return actor;
     }
 
@@ -98,7 +99,7 @@ public class ActorMain
 
         new VersionPlugin("1.0")
                 .register(server);
-        Routes.define(new HealthCheckController(), new ActionControlller(actor), server);
+        Routes.define(new HealthCheckController(), new ActionController(actor), server);
         //Relationships.define(server);
         //configurePlugins(config, server);
         //mapExceptions(server);

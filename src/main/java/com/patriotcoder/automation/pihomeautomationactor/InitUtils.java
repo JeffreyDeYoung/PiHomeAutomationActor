@@ -1,12 +1,17 @@
 package com.patriotcoder.automation.pihomeautomationactor;
 
 import com.docussandra.javasdk.Config;
+import com.docussandra.javasdk.SDKUtils;
 import com.docussandra.javasdk.dao.DocumentDao;
 import com.docussandra.javasdk.dao.QueryDao;
 import com.docussandra.javasdk.dao.impl.DocumentDaoImpl;
 import com.docussandra.javasdk.dao.impl.QueryDaoImpl;
 import com.docussandra.javasdk.exceptions.RESTException;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.mongodb.util.JSON;
+import com.patriotcoder.automation.pihomeautomationactor.dataobject.Action;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.ActorAbility;
+import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActor;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActorConfig;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.State;
 import com.pearson.docussandra.domain.objects.Database;
@@ -38,9 +43,9 @@ import org.json.simple.parser.ParseException;
  */
 public class InitUtils
 {
-
+    
     private PiActorConfig config;
-
+    
     public InitUtils(PiActorConfig config)
     {
         this.config = config;
@@ -123,16 +128,14 @@ public class InitUtils
      */
     public static PiActorConfig selfRegister(PiActorConfig config) throws RESTException, ParseException, IOException, IndexParseException
     {
-        String dbName = "pihomeautomation";
-        String tableName = "nodes";
         Config docussandraConfig = new Config(config.getDocussandraUrl());
         //search for any existing registrations
         QueryDao queryDao = new QueryDaoImpl(docussandraConfig);
         Query existanceQuery = new Query();
-        existanceQuery.setDatabase(dbName);
-        existanceQuery.setTable(tableName);
+        existanceQuery.setDatabase(Constants.DB);
+        existanceQuery.setTable(Constants.NODES_TABLE);
         existanceQuery.setWhere("name = '" + config.getPiName() + "'");
-        QueryResponseWrapper qrw = queryDao.query(dbName, existanceQuery);
+        QueryResponseWrapper qrw = queryDao.query(Constants.DB, existanceQuery);
         UUID updateUUID = null;
         if (!qrw.isEmpty()) //if we have an existing registration
         {
@@ -144,8 +147,8 @@ public class InitUtils
         //create or update the registration
         DocumentDao docDao = new DocumentDaoImpl(docussandraConfig);
         Table actorNodeTable = new Table();
-        actorNodeTable.database(new Database(dbName));
-        actorNodeTable.name(tableName);
+        actorNodeTable.database(new Database(Constants.DB));
+        actorNodeTable.name(Constants.NODES_TABLE);
         Document registerDoc = new Document();
         registerDoc.table(actorNodeTable);
         registerDoc.objectAsString(generateSelfRegisterJson(config));
@@ -158,6 +161,38 @@ public class InitUtils
             docDao.update(registerDoc);
         }
         return config;
+    }
+    
+    public static void setStates(PiActorConfig config, PiActor actor) throws IOException, IndexParseException, ParseException, RESTException
+    {
+        Config docussandraConfig = new Config(config.getDocussandraUrl());
+        QueryDao queryDao = new QueryDaoImpl(docussandraConfig);
+        DocumentDao docDao = new DocumentDaoImpl(docussandraConfig);
+        Table stateTable = new Table();
+        stateTable.database(Constants.DB);
+        stateTable.name(Constants.ACTOR_ABILITY_STATUS_TABLE);
+        final ObjectReader r = SDKUtils.getObjectMapper().reader(Action.class);
+        for (ActorAbility aa : config.getAbilities())
+        {
+            //search for any existing states
+            Query existanceQuery = new Query();
+            existanceQuery.setDatabase(Constants.DB);
+            existanceQuery.setTable(Constants.ACTOR_ABILITY_STATUS_TABLE);
+            existanceQuery.setWhere("name = '" + aa.getName() + "'");
+            QueryResponseWrapper qrw = queryDao.query(Constants.DB, existanceQuery);
+            if (qrw.isEmpty())
+            {
+                //it doesn't exist; let's set the default state into Docussandra
+                Document stateDoc = new Document();
+                stateDoc.table(stateTable);
+                stateDoc.objectAsString("{\"name\": \"" + aa.getName() + "\", \"state\":\"" + aa.getState() + "\"}");
+                docDao.create(stateTable, stateDoc);
+            } else {
+                BSONObject object = qrw.get(0).object();
+                actor.performAction((Action)r.readValue(JSON.serialize(object)));
+            }
+        }
+        
     }
 
     //stolen (then modified) from stackoverflow: http://stackoverflow.com/questions/9481865/getting-the-ip-address-of-the-current-machine-using-java
@@ -233,5 +268,5 @@ public class InitUtils
             throw unknownHostException;
         }
     }
-
+    
 }

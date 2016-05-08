@@ -67,7 +67,7 @@ public class PiActor
     }
 
     /**
-     * Builder method.
+     * Builder method. Warning: you can only init this once.
      *
      * @param config Config Object for this Actor.
      * @return a ready to use PiActor object.

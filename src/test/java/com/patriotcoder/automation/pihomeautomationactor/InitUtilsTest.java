@@ -1,10 +1,12 @@
 package com.patriotcoder.automation.pihomeautomationactor;
 
+import com.docussandra.javasdk.Config;
 import com.docussandra.javasdk.dao.QueryDao;
 import com.docussandra.javasdk.dao.impl.QueryDaoImpl;
 import com.docussandra.testhelpers.TestDocussandraManager;
 import com.mongodb.util.JSON;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.ActorAbility;
+import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActor;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActorConfig;
 import com.patriotcoder.pihomesecurity.Main;
 import com.patriotcoder.pihomesecurity.dataobjects.PiHomeConfig;
@@ -165,7 +167,40 @@ public class InitUtilsTest
         expected.setDocussandraUrl(null);
 
         PiActorConfig result = InitUtils.createConfigFromJSON(bson);
-        assertEquals(expected, result);        
+        assertEquals(expected, result);
+    }
+
+    /**
+     * Test of setStates method, of class InitUtils.
+     */
+    @Test
+    public void testSetStates() throws Exception
+    {
+        System.out.println("setStates");
+        File configFile = new File(".", "actor.config");
+        String docussandraUrl = "http://localhost:19080/";
+        PiActorConfig config = PiActorConfig.buildConfigFromFile(configFile);
+        config.setDocussandraUrl(docussandraUrl);
+
+        TestDocussandraManager.getManager().ensureTestDocussandraRunning(true);
+        PiHomeConfig serverConfig = new PiHomeConfig();
+        serverConfig.setDocussandraUrl(docussandraUrl);
+        Main.setUpDocussandra(serverConfig);
+        //end server setup
+
+        //PiActor actor = PiActor.getPiActor(config);
+        InitUtils.setStates(config, null);//run
+        //check
+        QueryDao queryDao = new QueryDaoImpl(new Config(docussandraUrl));
+        for (ActorAbility aa : config.getAbilities())
+        {
+            Query existanceQuery = new Query();
+            existanceQuery.setDatabase(Constants.DB);
+            existanceQuery.setTable(Constants.ACTOR_ABILITY_STATUS_TABLE);
+            existanceQuery.setWhere("name = '" + aa.getName() + "'");
+            QueryResponseWrapper qrw = queryDao.query(Constants.DB, existanceQuery);
+            assertTrue(qrw.size() == 1);
+        }
     }
 
 }

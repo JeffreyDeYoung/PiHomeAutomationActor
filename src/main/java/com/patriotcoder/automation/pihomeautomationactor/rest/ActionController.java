@@ -10,14 +10,14 @@ import org.slf4j.LoggerFactory;
 /**
  * REST controller for Database entities.
  */
-public class ActionControlller
+public class ActionController
 {
 
-    private static final Logger logger = LoggerFactory.getLogger(ActionControlller.class);
+    private static final Logger logger = LoggerFactory.getLogger(ActionController.class);
 
     private PiActor actor;
 
-    public ActionControlller(PiActor actor)
+    public ActionController(PiActor actor)
     {
         super();
         this.actor = actor;
