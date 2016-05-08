@@ -178,18 +178,20 @@ public class InitUtils
             Query existanceQuery = new Query();
             existanceQuery.setDatabase(Constants.DB);
             existanceQuery.setTable(Constants.ACTOR_ABILITY_STATUS_TABLE);
-            existanceQuery.setWhere("name = '" + aa.getName() + "'");
+            existanceQuery.setWhere("name = '"  + config.getPiName() + "_" + aa.getName() + "'");
             QueryResponseWrapper qrw = queryDao.query(Constants.DB, existanceQuery);
             if (qrw.isEmpty())
             {
                 //it doesn't exist; let's set the default state into Docussandra
                 Document stateDoc = new Document();
                 stateDoc.table(stateTable);
-                stateDoc.objectAsString("{\"name\": \"" + aa.getName() + "\", \"state\":\"" + aa.getState() + "\"}");
+                stateDoc.objectAsString("{\"name\": \"" + config.getPiName() + "_" + aa.getName() + "\", \"state\":\"" + aa.getState() + "\"}");
                 docDao.create(stateTable, stateDoc);
             } else {
                 BSONObject object = qrw.get(0).object();
-                actor.performAction((Action)r.readValue(JSON.serialize(object)));
+                Action a = (Action)r.readValue(JSON.serialize(object));
+                a.setName(a.getName().split("\\Q_\\E")[1]);//pull the pi name out
+                actor.performAction(a);
             }
         }
         

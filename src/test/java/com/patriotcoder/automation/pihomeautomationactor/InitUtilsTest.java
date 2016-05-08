@@ -6,7 +6,6 @@ import com.docussandra.javasdk.dao.impl.QueryDaoImpl;
 import com.docussandra.testhelpers.TestDocussandraManager;
 import com.mongodb.util.JSON;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.ActorAbility;
-import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActor;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActorConfig;
 import com.patriotcoder.pihomesecurity.Main;
 import com.patriotcoder.pihomesecurity.dataobjects.PiHomeConfig;
@@ -15,9 +14,7 @@ import com.pearson.docussandra.domain.objects.QueryResponseWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
-import org.apache.commons.math3.stat.inference.TestUtils;
 import org.bson.BSONObject;
-import org.bson.BasicBSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -25,7 +22,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 
 /**
  *
@@ -197,7 +193,7 @@ public class InitUtilsTest
             Query existanceQuery = new Query();
             existanceQuery.setDatabase(Constants.DB);
             existanceQuery.setTable(Constants.ACTOR_ABILITY_STATUS_TABLE);
-            existanceQuery.setWhere("name = '" + aa.getName() + "'");
+            existanceQuery.setWhere("name = '" + config.getPiName() + "_" + aa.getName() + "'");
             QueryResponseWrapper qrw = queryDao.query(Constants.DB, existanceQuery);
             assertTrue(qrw.size() == 1);
         }
