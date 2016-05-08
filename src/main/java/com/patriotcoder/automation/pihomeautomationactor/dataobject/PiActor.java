@@ -37,6 +37,7 @@ public class PiActor
             GpioPinDigitalOutput output = gpio.provisionDigitalOutputPin(aa.getGpioPin(), aa.getName(), aa.getStartAndEndPinState());
             output.setShutdownOptions(true, aa.getStartAndEndPinState(), PinPullResistance.OFF);
             outputs.put(aa.getName(), output);
+            logger.info("Adding output: " + output.getName() + " for aa: " + aa.getName());
             actorMap.put(aa.getName(), aa);
         }
         logger.debug("Done initalizing PI actor.");
@@ -46,7 +47,8 @@ public class PiActor
     {
         GpioPinDigitalOutput output = outputs.get(action.getName());
         ActorAbility aa = actorMap.get(action.getName());
-        logger.debug("Performing action: " + action.toString() + " on " + output.toString());
+        logger.debug("Performing action: " + action.toString());
+        logger.debug("-- on " + output.toString());
 
         if (output == null)
         {
