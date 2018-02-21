@@ -1,12 +1,12 @@
 package com.patriotcoder.automation.pihomeautomationactor;
 
-import com.docussandra.javasdk.Config;
-import com.docussandra.javasdk.SDKUtils;
-import com.docussandra.javasdk.dao.DocumentDao;
-import com.docussandra.javasdk.dao.QueryDao;
-import com.docussandra.javasdk.dao.impl.DocumentDaoImpl;
-import com.docussandra.javasdk.dao.impl.QueryDaoImpl;
-import com.docussandra.javasdk.exceptions.RESTException;
+import com.ampliciti.db.docussandra.javasdk.Config;
+import com.ampliciti.db.docussandra.javasdk.SDKUtils;
+import com.ampliciti.db.docussandra.javasdk.dao.DocumentDao;
+import com.ampliciti.db.docussandra.javasdk.dao.QueryDao;
+import com.ampliciti.db.docussandra.javasdk.dao.impl.DocumentDaoImpl;
+import com.ampliciti.db.docussandra.javasdk.dao.impl.QueryDaoImpl;
+import com.ampliciti.db.docussandra.javasdk.exceptions.RESTException;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.mongodb.util.JSON;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.Action;
@@ -135,23 +135,23 @@ public class InitUtils
         existanceQuery.setDatabase(Constants.DB);
         existanceQuery.setTable(Constants.NODES_TABLE);
         existanceQuery.setWhere("name = '" + config.getPiName() + "'");
-        QueryResponseWrapper qrw = queryDao.query(Constants.DB, existanceQuery);
+        QueryResponseWrapper qrw = queryDao.query(existanceQuery);
         UUID updateUUID = null;
         if (!qrw.isEmpty()) //if we have an existing registration
         {
             updateUUID = qrw.get(0).getUuid();//grab the UUID
-            config = createConfigFromJSON(qrw.get(0).object());//and the current information
+            config = createConfigFromJSON(qrw.get(0).getObject());//and the current information
             config.setDocussandraUrl(docussandraConfig.getBaseUrl());//the builder object doesn't set the url
         }
 
         //create or update the registration
         DocumentDao docDao = new DocumentDaoImpl(docussandraConfig);
         Table actorNodeTable = new Table();
-        actorNodeTable.database(new Database(Constants.DB));
-        actorNodeTable.name(Constants.NODES_TABLE);
+        actorNodeTable.setDatabaseByObject(new Database(Constants.DB));
+        actorNodeTable.setName(Constants.NODES_TABLE);
         Document registerDoc = new Document();
-        registerDoc.table(actorNodeTable);
-        registerDoc.objectAsString(generateSelfRegisterJson(config));
+        registerDoc.setTable(actorNodeTable);
+        registerDoc.setObjectAsString(generateSelfRegisterJson(config));
         if (updateUUID == null)
         {
             docDao.create(actorNodeTable, registerDoc);//create; it hasn't been registered
@@ -169,8 +169,8 @@ public class InitUtils
         QueryDao queryDao = new QueryDaoImpl(docussandraConfig);
         DocumentDao docDao = new DocumentDaoImpl(docussandraConfig);
         Table stateTable = new Table();
-        stateTable.database(Constants.DB);
-        stateTable.name(Constants.ACTOR_ABILITY_STATUS_TABLE);
+        stateTable.setDatabaseByString(Constants.DB);
+        stateTable.setName(Constants.ACTOR_ABILITY_STATUS_TABLE);
         final ObjectReader r = SDKUtils.getObjectMapper().reader(Action.class);
         for (ActorAbility aa : config.getAbilities())
         {
@@ -179,16 +179,16 @@ public class InitUtils
             existanceQuery.setDatabase(Constants.DB);
             existanceQuery.setTable(Constants.ACTOR_ABILITY_STATUS_TABLE);
             existanceQuery.setWhere("name = '"  + config.getPiName() + "_" + aa.getName() + "'");
-            QueryResponseWrapper qrw = queryDao.query(Constants.DB, existanceQuery);
+            QueryResponseWrapper qrw = queryDao.query(existanceQuery);
             if (qrw.isEmpty())
             {
                 //it doesn't exist; let's set the default state into Docussandra
                 Document stateDoc = new Document();
-                stateDoc.table(stateTable);
-                stateDoc.objectAsString("{\"name\": \"" + config.getPiName() + "_" + aa.getName() + "\", \"state\":\"" + aa.getState() + "\"}");
+                stateDoc.setTable(stateTable);
+                stateDoc.setObjectAsString("{\"name\": \"" + config.getPiName() + "_" + aa.getName() + "\", \"state\":\"" + aa.getState() + "\"}");
                 docDao.create(stateTable, stateDoc);
             } else {
-                BSONObject object = qrw.get(0).object();
+                BSONObject object = qrw.get(0).getObject();
                 Action a = (Action)r.readValue(JSON.serialize(object));
                 a.setName(a.getName().split("\\Q_\\E")[1]);//pull the pi name out
                 actor.performAction(a);

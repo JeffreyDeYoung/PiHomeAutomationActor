@@ -1,14 +1,14 @@
 package com.patriotcoder.automation.pihomeautomationactor;
 
-import com.docussandra.javasdk.Config;
-import com.docussandra.javasdk.dao.QueryDao;
-import com.docussandra.javasdk.dao.impl.QueryDaoImpl;
-import com.docussandra.testhelpers.TestDocussandraManager;
+import com.ampliciti.db.docussandra.javasdk.Config;
+import com.ampliciti.db.docussandra.javasdk.dao.QueryDao;
+import com.ampliciti.db.docussandra.javasdk.dao.impl.QueryDaoImpl;
 import com.mongodb.util.JSON;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.ActorAbility;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActorConfig;
 import com.patriotcoder.pihomesecurity.Main;
 import com.patriotcoder.pihomesecurity.dataobjects.PiHomeConfig;
+import com.docussandra.testhelpers.TestDocussandraManager;
 import com.pearson.docussandra.domain.objects.Query;
 import com.pearson.docussandra.domain.objects.QueryResponseWrapper;
 import java.io.File;
@@ -115,14 +115,14 @@ public class InitUtilsTest
         //check
         String dbName = "pihomeautomation";
         String tableName = "nodes";
-        com.docussandra.javasdk.Config docussandraConfig = new com.docussandra.javasdk.Config(config.getDocussandraUrl());
+        com.ampliciti.db.docussandra.javasdk.Config docussandraConfig = new com.ampliciti.db.docussandra.javasdk.Config(config.getDocussandraUrl());
         //search for this node to see if it exists
         QueryDao queryDao = new QueryDaoImpl(docussandraConfig);
         Query existanceQuery = new Query();
         existanceQuery.setDatabase(dbName);
         existanceQuery.setTable(tableName);
         existanceQuery.setWhere("name = \'" + config.getPiName() + "\'");
-        QueryResponseWrapper qrw = queryDao.query(dbName, existanceQuery);
+        QueryResponseWrapper qrw = queryDao.query(existanceQuery);
         UUID updateUUID = null;
         if (!qrw.isEmpty())
         {
@@ -132,7 +132,7 @@ public class InitUtilsTest
         //update register
         InitUtils.selfRegister(config);
         //check again
-        qrw = queryDao.query(dbName, existanceQuery);
+        qrw = queryDao.query(existanceQuery);
         UUID newUpdateUUID = null;
         if (!qrw.isEmpty())
         {
@@ -194,7 +194,7 @@ public class InitUtilsTest
             existanceQuery.setDatabase(Constants.DB);
             existanceQuery.setTable(Constants.ACTOR_ABILITY_STATUS_TABLE);
             existanceQuery.setWhere("name = '" + config.getPiName() + "_" + aa.getName() + "'");
-            QueryResponseWrapper qrw = queryDao.query(Constants.DB, existanceQuery);
+            QueryResponseWrapper qrw = queryDao.query(existanceQuery);
             assertTrue(qrw.size() == 1);
         }
     }

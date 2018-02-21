@@ -1,6 +1,6 @@
 package com.patriotcoder.automation.pihomeautomationactor;
 
-import com.docussandra.javasdk.exceptions.RESTException;
+import com.ampliciti.db.docussandra.javasdk.exceptions.RESTException;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActor;
 import com.patriotcoder.automation.pihomeautomationactor.dataobject.PiActorConfig;
 import com.patriotcoder.automation.pihomeautomationactor.rest.ActionController;

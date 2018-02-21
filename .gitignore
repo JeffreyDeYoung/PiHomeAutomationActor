@@ -1,4 +1,6 @@
 /target/
 *.class
 *~
-
+nb-configuration.xml
+nbactions-Raspberry Pi.xml
+src/deb/
