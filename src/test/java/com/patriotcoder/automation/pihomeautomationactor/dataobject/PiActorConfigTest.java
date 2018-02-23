@@ -15,81 +15,61 @@ import static org.junit.Assert.*;
  *
  * @author https://github.com/JeffreyDeYoung
  */
-public class PiActorConfigTest
-{
+public class PiActorConfigTest {
 
-    public PiActorConfigTest()
-    {
-    }
+  public PiActorConfigTest() {}
 
-    @BeforeClass
-    public static void setUpClass()
-    {
-    }
+  @BeforeClass
+  public static void setUpClass() {}
 
-    @AfterClass
-    public static void tearDownClass()
-    {
-    }
+  @AfterClass
+  public static void tearDownClass() {}
 
-    @Before
-    public void setUp()
-    {
-    }
+  @Before
+  public void setUp() {}
 
-    @After
-    public void tearDown()
-    {
-    }
+  @After
+  public void tearDown() {}
 
-    /**
-     * Test of buildConfigFromString method, of class Config.
-     */
-    @Test
-    public void testBuildConfigFromString()
-    {
-        System.out.println("buildConfigFromString");
-        String in = "#This is a sample configuration file.\n"
-                + "#Name of this actor\n"
-                + "BarnActor\n"
-                + "#Location of this actor\n"
-                + "Barn\n"
-                + "#Docussandra URL\n"
-                + "http://10.0.0.1\n"
-                + "#Start of Ability Descriptions\n"
-                + "MainAir 7 HIGH OFF\n"
-                + "HouseAir 8 HIGH OFF\n"
-                + "EquipmentBreaker 9 HIGH OFF\n"
-                + "AirCompressor 10 HIGH OFF";
-        ArrayList<ActorAbility> abilities = new ArrayList<>(4);
-        abilities.add(new ActorAbility("MainAir", RaspiPin.GPIO_07, PinState.HIGH, State.OFF));
-        abilities.add(new ActorAbility("HouseAir", RaspiPin.GPIO_08, PinState.HIGH, State.OFF));
-        abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_09, PinState.HIGH, State.OFF));
-        abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_10, PinState.HIGH, State.OFF));
-        String expectedName = "BarnActor";
-        PiActorConfig expResult = new PiActorConfig(expectedName, "barn", "http://10.0.0.1", abilities);
-        PiActorConfig result = PiActorConfig.buildConfigFromString(in);
-        assertEquals(expResult, result);
-    }
+  /**
+   * Test of buildConfigFromString method, of class Config.
+   */
+  @Test
+  public void testBuildConfigFromString() {
+    System.out.println("buildConfigFromString");
+    String in = "#This is a sample configuration file.\n" + "#Name of this actor\n" + "BarnActor\n"
+        + "#Location of this actor\n" + "Barn\n" + "#Docussandra URL\n" + "http://10.0.0.1\n"
+        + "#Start of Ability Descriptions\n" + "MainAir 7 HIGH OFF\n" + "HouseAir 8 HIGH OFF\n"
+        + "EquipmentBreaker 9 HIGH OFF\n" + "AirCompressor 10 HIGH OFF";
+    ArrayList<ActorAbility> abilities = new ArrayList<>(4);
+    abilities.add(new ActorAbility("MainAir", RaspiPin.GPIO_07, PinState.HIGH, State.OFF));
+    abilities.add(new ActorAbility("HouseAir", RaspiPin.GPIO_08, PinState.HIGH, State.OFF));
+    abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_09, PinState.HIGH, State.OFF));
+    abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_10, PinState.HIGH, State.OFF));
+    String expectedName = "BarnActor";
+    PiActorConfig expResult = new PiActorConfig(expectedName, "barn", "http://10.0.0.1", abilities);
+    PiActorConfig result = PiActorConfig.buildConfigFromString(in);
+    assertEquals(expResult, result);
+  }
 
-    /**
-     * Test of buildConfigFromFile method, of class Config.
-     */
-    @Test
-    public void testBuildConfigFromFile() throws Exception
-    {
-        System.out.println("buildConfigFromFile");
-        ArrayList<ActorAbility> abilities = new ArrayList<>(4);
-        abilities.add(new ActorAbility("MainAir", RaspiPin.GPIO_07, PinState.HIGH, State.OFF));
-        abilities.add(new ActorAbility("HouseAir", RaspiPin.GPIO_00, PinState.HIGH, State.OFF));
-        abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_02, PinState.HIGH, State.OFF));
-        abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_03, PinState.HIGH, State.OFF));
-        String expectedName = "BarnActor";
-        PiActorConfig expResult = new PiActorConfig(expectedName, "barn", "http://localhost:8081", abilities);
-        File configFile = new File(".", "actor.config");
-        PiActorConfig result = PiActorConfig.buildConfigFromFile(configFile);
-        assertEquals(expResult, result);
+  /**
+   * Test of buildConfigFromFile method, of class Config.
+   */
+  @Test
+  public void testBuildConfigFromFile() throws Exception {
+    System.out.println("buildConfigFromFile");
+    ArrayList<ActorAbility> abilities = new ArrayList<>(4);
+    abilities.add(new ActorAbility("MainAir", RaspiPin.GPIO_07, PinState.HIGH, State.OFF));
+    abilities.add(new ActorAbility("HouseAir", RaspiPin.GPIO_00, PinState.HIGH, State.OFF));
+    abilities.add(new ActorAbility("EquipmentBreaker", RaspiPin.GPIO_02, PinState.HIGH, State.OFF));
+    abilities.add(new ActorAbility("AirCompressor", RaspiPin.GPIO_03, PinState.HIGH, State.OFF));
+    String expectedName = "BarnActor";
+    PiActorConfig expResult =
+        new PiActorConfig(expectedName, "barn", "http://localhost:8081", abilities);
+    File configFile = new File(".", "actor.config");
+    PiActorConfig result = PiActorConfig.buildConfigFromFile(configFile);
+    assertEquals(expResult, result);
 
-    }
+  }
 
 }
